@@ -12,29 +12,28 @@ ADDONS[3]=http://www.curse.com/addons/wow/raidachievement_oldmodules/download
 ADDONS[4]=http://www.curse.com/addons/wow/raidachievement_pandaria/download
 ADDONS[5]=http://www.curse.com/addons/wow/raidachievement/download
 ADDONS[6]=http://www.curse.com/addons/wow/clique/download
-ADDONS[7]=http://www.curse.com/addons/wow/altoholic/download
-ADDONS[8]=http://www.curse.com/addons/wow/npcscan-overlay/download
-ADDONS[9]=http://www.curse.com/addons/wow/master-plan/download
-ADDONS[10]=http://www.curse.com/addons/wow/npcscan/download
-ADDONS[11]=http://www.curse.com/addons/wow/handynotes/download
-ADDONS[12]=http://www.curse.com/addons/wow/recount/download
-ADDONS[13]=http://www.curse.com/addons/wow/deadly-boss-mods/download
-ADDONS[14]=http://www.curse.com/addons/wow/grail/download
-ADDONS[15]=http://www.curse.com/addons/wow/tomtom/download
-ADDONS[16]=http://www.curse.com/addons/wow/lorewalkers-helper/download
-ADDONS[17]=http://www.curse.com/addons/wow/lorewalkers/download
-ADDONS[18]=http://www.curse.com/addons/wow/handynotes_lorewalkers/download
-ADDONS[19]=http://www.curse.com/addons/wow/loremasteraddon/download
-ADDONS[20]=http://www.curse.com/addons/wow/dark-soil/download
-ADDONS[21]=http://www.curse.com/addons/wow/finders-keepers/download
-ADDONS[22]=http://www.curse.com/addons/wow/vludstillergifts/download
-ADDONS[23]=http://www.curse.com/addons/wow/arl/download
-ADDONS[24]=http://www.curse.com/addons/wow/weakauras-2/download
-ADDONS[25]=http://www.curse.com/addons/wow/blood-shield-tracker/download
-ADDONS[26]=http://www.curse.com/addons/wow/bagsync/download
-ADDONS[27]=http://www.curse.com/addons/wow/pawn/download
-ADDONS[28]=http://www.curse.com/addons/wow/mmz/download
-ADDONS[29]=http://www.curse.com/addons/wow/crossrealmassist/download
+ADDONS[7]=http://www.curse.com/addons/wow/master-plan/download
+ADDONS[8]=http://www.curse.com/addons/wow/handynotes/download
+ADDONS[9]=http://www.curse.com/addons/wow/recount/download
+ADDONS[10]=http://www.curse.com/addons/wow/deadly-boss-mods/download
+ADDONS[11]=http://www.curse.com/addons/wow/grail/download
+ADDONS[12]=http://www.curse.com/addons/wow/tomtom/download
+ADDONS[13]=http://www.curse.com/addons/wow/lorewalkers-helper/download
+ADDONS[14]=http://www.curse.com/addons/wow/lorewalkers/download
+ADDONS[15]=http://www.curse.com/addons/wow/handynotes_lorewalkers/download
+ADDONS[16]=http://www.curse.com/addons/wow/loremasteraddon/download
+ADDONS[17]=http://www.curse.com/addons/wow/finders-keepers/download
+ADDONS[18]=http://www.curse.com/addons/wow/arl/download
+ADDONS[19]=http://www.curse.com/addons/wow/weakauras-2/download
+ADDONS[20]=http://www.curse.com/addons/wow/blood-shield-tracker/download
+ADDONS[21]=http://www.curse.com/addons/wow/bagsync/download
+ADDONS[22]=http://www.curse.com/addons/wow/pawn/download
+ADDONS[23]=http://www.curse.com/addons/wow/mmz/download
+ADDONS[24]=http://www.curse.com/addons/wow/crossrealmassist/download
+ADDONS[25]=https://github.com/TekNoLogic/VendorBait.git
+ADDONS[26]=https://github.com/ColbyWanShinobi/gsReloadUI.git
+ADDONS[27]=https://github.com/ColbyWanShinobi/gsNoGryphons.git
+ADDONS[28]=https://github.com/ColbyWanShinobi/gsQuestSounds.git
 
 #Default WoW install path on OSX
 ADDONPATH=/Applications/World\ of\ Warcraft/Interface/AddOns
@@ -176,6 +175,48 @@ function dlIndy {
 	rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
 }
 
+function dlGitAddon {
+	echo "Updating Addon using git..."
+	#Get the URL to download the file
+	local DLURL=$1
+	echo "Download URL: ${GREEN}$DLURL${CRESET}"
+
+	#Get the name of the file itself
+	#local ZFILE=$(parseFileName $DLURL)
+	#echo "Zip File: ${GREEN}$ZFILE${CRESET}"
+
+	#Get the name of just the zip file
+	local GDIRNAME=$(echo $DLURL | grep -E -o '\w+.git' | cut -f1 -d.)
+
+	if [ -d "$ADDONPATH/$GDIRNAME" ]
+	then
+		echo "Updating from git repository for : ${GREEN}$GDIRNAME${CRESET}"
+		git -C "$ADDONPATH/$GDIRNAME" pull
+	else
+		echo "Cloning from git repository for : ${GREEN}$GDIRNAME${CRESET}"
+		git -C "$ADDONPATH" clone $DLURL
+	fi 
+#exit
+	#Remove the temp dir if it exists
+	#rm -rfv /tmp/CoS/tmpAddon
+
+	#Re-create the dir
+	#mkdir -p /tmp/CoS/tmpAddon
+
+	#Download the file
+	#echo "Downloading file: ${GREEN}$DLURL${CRESET}"
+	#cd /tmp/CoS
+	#wget -N $DLURL
+
+	#Unzip the file to a temp directory
+	#ZDIRNAME=tmpCurseDl
+	#echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
+	#unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
+
+	#Copy only new files into the Addon directory
+	#rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
+}
+
 function dlAddon {
 	echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
 	PROVIDER=$(getAddonProvider $1)
@@ -189,7 +230,7 @@ function dlAddon {
 	  dlWowIAddon $1
 	elif [ "$PROVIDER" == "github.com" ]
 	then
-	  echo "github"
+	  dlGitAddon $1
 	else
 	  dlIndy $1
 	fi
