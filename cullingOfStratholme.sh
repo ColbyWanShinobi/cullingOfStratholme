@@ -2,38 +2,23 @@
 
 set -e
 PWD="$(pwd)"
+SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
+ADDONLIST=cullingOfStratholme.list
+ALFULL=$SCRIPTDIR/$ADDONLIST
+
+#Check to see if the text file exists
+if [ ! -f $ALFULL ]
+then
+	echo "Could not find file: $ADDONLIST"
+fi
 
 declare -a ADDONS
-
-ADDONS[0]=https://addon.theunderminejournal.com/TheUndermineJournal.zip
-ADDONS[1]=http://www.wowinterface.com/downloads/info7017-LightHeaded.html
-ADDONS[2]=https://s3.amazonaws.com/WoW-Pro/WoWPro+v6.2.2.zip
-ADDONS[3]=http://www.curse.com/addons/wow/raidachievement_oldmodules/download
-ADDONS[4]=http://www.curse.com/addons/wow/raidachievement_pandaria/download
-ADDONS[5]=http://www.curse.com/addons/wow/raidachievement/download
-ADDONS[6]=http://www.curse.com/addons/wow/clique/download
-ADDONS[7]=http://www.curse.com/addons/wow/master-plan/download
-ADDONS[8]=http://www.curse.com/addons/wow/handynotes/download
-ADDONS[9]=http://www.curse.com/addons/wow/recount/download
-ADDONS[10]=http://www.curse.com/addons/wow/deadly-boss-mods/download
-ADDONS[11]=http://www.curse.com/addons/wow/grail/download
-ADDONS[12]=http://www.curse.com/addons/wow/tomtom/download
-ADDONS[13]=http://www.curse.com/addons/wow/lorewalkers-helper/download
-ADDONS[14]=http://www.curse.com/addons/wow/lorewalkers/download
-ADDONS[15]=http://www.curse.com/addons/wow/handynotes_lorewalkers/download
-ADDONS[16]=http://www.curse.com/addons/wow/loremasteraddon/download
-ADDONS[17]=http://www.curse.com/addons/wow/finders-keepers/download
-ADDONS[18]=http://www.curse.com/addons/wow/arl/download
-ADDONS[19]=http://www.curse.com/addons/wow/weakauras-2/download
-ADDONS[20]=http://www.curse.com/addons/wow/blood-shield-tracker/download
-ADDONS[21]=http://www.curse.com/addons/wow/bagsync/download
-ADDONS[22]=http://www.curse.com/addons/wow/pawn/download
-ADDONS[23]=http://www.curse.com/addons/wow/mmz/download
-ADDONS[24]=http://www.curse.com/addons/wow/crossrealmassist/download
-ADDONS[25]=https://github.com/TekNoLogic/VendorBait.git
-ADDONS[26]=https://github.com/ColbyWanShinobi/gsReloadUI.git
-ADDONS[27]=https://github.com/ColbyWanShinobi/gsNoGryphons.git
-ADDONS[28]=https://github.com/ColbyWanShinobi/gsQuestSounds.git
+ADDONCOUNT=0
+while read f
+do
+	ADDONS[$ADDONCOUNT]=$f
+	ADDONCOUNT=$(($ADDONCOUNT + 1))
+done < $ALFULL
 
 #Default WoW install path on OSX
 ADDONPATH=/Applications/World\ of\ Warcraft/Interface/AddOns
