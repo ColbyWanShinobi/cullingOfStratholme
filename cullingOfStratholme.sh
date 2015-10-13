@@ -34,39 +34,6 @@ function getAddonProvider {
 	#echo $PROVIDER
 }
 
-function dlWowIAddon {
-	echo "Updating Addon from wowinterface.com..."
-
-	#Get the URL to download the file
-	local DLURL="http://www.wowinterface.com/downloads/getfile.php?id=$(wget -q $1 -O - | grep landing | grep -E -o 'fileid=\d+' | uniq | cut -f2 -d=)"
-	echo "Download URL: ${GREEN}$DLURL${CRESET}"
-
-	#Set the name of the file manually
-	local ZFILE=addon.zip
-	echo "Zip File: ${GREEN}$ZFILE${CRESET}"
-
-	#Get the name of just the zip file
-	local ZDIRNAME=wow_interface_addon
-
-	#Remove the temp dir if it exists
-	rm -rfv /tmp/CoS/tmpAddon
-
-	#Re-create the dir
-	mkdir -p /tmp/CoS/tmpAddon
-
-	#Download the file
-	echo "Downloading file: ${GREEN}$DLURL${CRESET}"
-	wget -O /tmp/CoS/$ZFILE $DLURL
-
-	#Unzip the file to a temp directory
-	ZDIRNAME=tmpCurseDl
-	echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
-	unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
-
-	#Copy only new files into the Addon directory
-	rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
-}
-
 function printList {
 	ADDONCOUNT=0
 	for i in "${ADDONS[@]}";
@@ -97,7 +64,7 @@ function parseAddonDirName {
 function dlCurseAddon {
 	echo "Updating Addon from curse.com..."
 	#Get the URL to download the file
-	local DLURL="$(wget -q $1 -O - | grep "If your download" | grep -E -o 'http://.*\.zip')"
+	local DLURL="$(wget --random-wait -q $1 -O - | grep "If your download" | grep -E -o 'http://.*\.zip')"
 	echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
 	#Get the name of the file itself
@@ -108,7 +75,7 @@ function dlCurseAddon {
 	local ZDIRNAME=$(parseDirName $ZFILE)
 
 	#Remove the temp dir if it exists
-	rm -rfv /tmp/CoS/tmpAddon
+	rm -rf /tmp/CoS/tmpAddon
 
 	#Re-create the dir
 	mkdir -p /tmp/CoS/tmpAddon
@@ -116,7 +83,7 @@ function dlCurseAddon {
 	#Download the file
 	echo "Downloading file: ${GREEN}$DLURL${CRESET}"
 	cd /tmp/CoS
-	wget -N $DLURL
+	wget --random-wait -N $DLURL
 
 	#Unzip the file to a temp directory
 	ZDIRNAME=tmpCurseDl
@@ -141,7 +108,7 @@ function dlIndy {
 	local ZDIRNAME=$(parseDirName $ZFILE)
 
 	#Remove the temp dir if it exists
-	rm -rfv /tmp/CoS/tmpAddon
+	rm -rf /tmp/CoS/tmpAddon
 
 	#Re-create the dir
 	mkdir -p /tmp/CoS/tmpAddon
@@ -149,7 +116,7 @@ function dlIndy {
 	#Download the file
 	echo "Downloading file: ${GREEN}$DLURL${CRESET}"
 	cd /tmp/CoS
-	wget -N $DLURL
+	wget --random-wait -N $DLURL
 
 	#Unzip the file to a temp directory
 	ZDIRNAME=tmpCurseDl
@@ -166,10 +133,6 @@ function dlGitAddon {
 	local DLURL=$1
 	echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
-	#Get the name of the file itself
-	#local ZFILE=$(parseFileName $DLURL)
-	#echo "Zip File: ${GREEN}$ZFILE${CRESET}"
-
 	#Get the name of just the zip file
 	local GDIRNAME=$(echo $DLURL | grep -E -o '\w+.git' | cut -f1 -d.)
 
@@ -181,25 +144,41 @@ function dlGitAddon {
 		echo "Cloning from git repository for : ${GREEN}$GDIRNAME${CRESET}"
 		git -C "$ADDONPATH" clone $DLURL
 	fi 
-#exit
+}
+
+function dlWowIAddon {
+	echo "Updating Addon from wowinterface.com..."
+
+	#Get the URL to download the file
+	local DLURL="http://www.wowinterface.com/downloads/getfile.php?id=$(wget --random-wait -q $1 -O - | grep landing | grep -E -o 'fileid=\d+' | uniq | cut -f2 -d=)"
+	echo "Download URL: ${GREEN}$DLURL${CRESET}"
+
+	#Get the name of the file itself
+	local ZFILE=$(curl -Is $DLURL | grep Content-disposition | cut -f2 -d\")
+	echo "Zip File: ${GREEN}$ZFILE${CRESET}"
+	
+	#Get the name of just the zip file
+	local ZDIRNAME=$(parseDirName $ZFILE)
+
 	#Remove the temp dir if it exists
-	#rm -rfv /tmp/CoS/tmpAddon
+	rm -rf /tmp/CoS/tmpAddon
 
 	#Re-create the dir
-	#mkdir -p /tmp/CoS/tmpAddon
+	mkdir -p /tmp/CoS/tmpAddon
 
 	#Download the file
-	#echo "Downloading file: ${GREEN}$DLURL${CRESET}"
-	#cd /tmp/CoS
-	#wget -N $DLURL
+	echo "Downloading file: ${GREEN}$DLURL${CRESET}"
+	cd /tmp/CoS
+	wget --content-disposition --random-wait -N $DLURL
 
 	#Unzip the file to a temp directory
-	#ZDIRNAME=tmpCurseDl
-	#echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
-	#unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
+	ZDIRNAME=tmpCurseDl
+	echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
+	unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
 
 	#Copy only new files into the Addon directory
-	#rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
+	rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
+
 }
 
 function dlAddon {
