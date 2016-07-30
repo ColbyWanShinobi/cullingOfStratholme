@@ -66,7 +66,7 @@ function dlCurseAddon {
 	#Get the URL to download the file
 	local DLURL="$(wget --random-wait -q $1 -O - | grep "If your download" | grep -E -o 'http://.*\.zip')"
 
-	if [ $DLURL -ne '' ]
+	if [ $DLURL != '' ]
 	then
 		echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
