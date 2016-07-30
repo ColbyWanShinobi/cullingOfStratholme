@@ -65,33 +65,41 @@ function dlCurseAddon {
 	echo "Updating Addon from curse.com..."
 	#Get the URL to download the file
 	local DLURL="$(wget --random-wait -q $1 -O - | grep "If your download" | grep -E -o 'http://.*\.zip')"
-	echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
-	#Get the name of the file itself
-	local ZFILE=$(parseFileName $DLURL)
-	echo "Zip File: ${GREEN}$ZFILE${CRESET}"
+	if [ $DLURL -ne '' ]
+	then
+		echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
-	#Get the name of just the zip file
-	local ZDIRNAME=$(parseDirName $ZFILE)
+		#Get the name of the file itself
+		local ZFILE=$(parseFileName $DLURL)
+		echo "Zip File: ${GREEN}$ZFILE${CRESET}"
 
-	#Remove the temp dir if it exists
-	rm -rf /tmp/CoS/tmpAddon
+		#Get the name of just the zip file
+		local ZDIRNAME=$(parseDirName $ZFILE)
 
-	#Re-create the dir
-	mkdir -p /tmp/CoS/tmpAddon
+		#Remove the temp dir if it exists
+		rm -rf /tmp/CoS/tmpAddon
 
-	#Download the file
-	echo "Downloading file: ${GREEN}$DLURL${CRESET}"
-	cd /tmp/CoS
-	wget --random-wait -N $DLURL
+		#Re-create the dir
+		mkdir -p /tmp/CoS/tmpAddon
 
-	#Unzip the file to a temp directory
-	ZDIRNAME=tmpCurseDl
-	echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
-	unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
+		#Download the file
+		echo "Downloading file: ${GREEN}$DLURL${CRESET}"
+		cd /tmp/CoS
+		wget --random-wait -N $DLURL
 
-	#Copy only new files into the Addon directory
-	rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
+		#Unzip the file to a temp directory
+		ZDIRNAME=tmpCurseDl
+		echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
+		unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
+
+		#Copy only new files into the Addon directory
+		rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
+	else
+	    echo "Download failed for: $1"
+	fi
+
+
 }
 
 function dlIndy {
