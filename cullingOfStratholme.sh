@@ -143,7 +143,7 @@ function dlGitAddon {
 	else
 		echo "Cloning from git repository for : ${GREEN}$GDIRNAME${CRESET}"
 		git -C "$ADDONPATH" clone $DLURL
-	fi 
+	fi
 }
 
 function dlWowIAddon {
@@ -156,7 +156,7 @@ function dlWowIAddon {
 	#Get the name of the file itself
 	local ZFILE=$(curl -Is $DLURL | grep Content-disposition | cut -f2 -d\")
 	echo "Zip File: ${GREEN}$ZFILE${CRESET}"
-	
+
 	#Get the name of just the zip file
 	local ZDIRNAME=$(parseDirName $ZFILE)
 
@@ -185,7 +185,7 @@ function dlAddon {
 	echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
 	PROVIDER=$(getAddonProvider $1)
 	echo "Found Provider: ${GREEN}$PROVIDER${CRESET}"
-	
+
 	if [ "$PROVIDER" == "curse.com" ]
 	then
 		dlCurseAddon $1
