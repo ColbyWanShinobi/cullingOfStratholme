@@ -64,7 +64,8 @@ function parseAddonDirName {
 function dlCurseAddon {
 	echo "Updating Addon from curse.com..."
 	#Get the URL to download the file
-	local DLURL="$(wget --random-wait -q $1 -O - | grep "If your download" | grep -E -o 'http://.*\.zip')"
+	local DLURL="$(wget --random-wait -q $1 -O - | grep "If your download" | grep -E -o 'https://.*\.zip')"
+
 
 	if [ $DLURL != '' ]
 	then
@@ -86,7 +87,7 @@ function dlCurseAddon {
 		#Download the file
 		echo "Downloading file: ${GREEN}$DLURL${CRESET}"
 		cd /tmp/CoS
-		wget --random-wait -N $DLURL
+		wget --random-wait -N "$DLURL"
 
 		#Unzip the file to a temp directory
 		ZDIRNAME=tmpCurseDl
