@@ -46,8 +46,8 @@ function printList {
 }
 
 function parseFileName {
-	local FILENAME="$(echo $1 | grep -E -o '[A-Z,a-z,0-9,\._+-]*\.zip$')"
-	echo $FILENAME
+	local FILENAME="$(echo $1 | grep -E -o '[^\/]+$')"
+	echo "$FILENAME"
 }
 
 function parseDirName {
@@ -66,13 +66,12 @@ function dlCurseAddon {
 	#Get the URL to download the file
 	local DLURL="$(wget --random-wait -q $1 -O - | grep "If your download" | grep -E -o 'https://.*\.zip')"
 
-
-	if [ $DLURL != '' ]
-	then
+	#if [ "$DLURL" != '' ]
+	#then
 		echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
 		#Get the name of the file itself
-		local ZFILE=$(parseFileName $DLURL)
+		local ZFILE=$(parseFileName "$DLURL")
 		echo "Zip File: ${GREEN}$ZFILE${CRESET}"
 
 		#Get the name of just the zip file
@@ -92,13 +91,13 @@ function dlCurseAddon {
 		#Unzip the file to a temp directory
 		ZDIRNAME=tmpCurseDl
 		echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
-		unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
+		unzip -o "/tmp/CoS/$ZFILE" -d /tmp/CoS/tmpAddon
 
 		#Copy only new files into the Addon directory
 		rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
-	else
-	    echo "Download failed for: $1"
-	fi
+	#else
+	    #echo "Download failed for: $1"
+	#fi
 
 
 }
@@ -110,7 +109,7 @@ function dlIndy {
 	echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
 	#Get the name of the file itself
-	local ZFILE=$(parseFileName $DLURL)
+	local ZFILE=$(parseFileName "$DLURL")
 	echo "Zip File: ${GREEN}$ZFILE${CRESET}"
 
 	#Get the name of just the zip file
@@ -130,7 +129,7 @@ function dlIndy {
 	#Unzip the file to a temp directory
 	ZDIRNAME=tmpCurseDl
 	echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
-	unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
+	unzip -o "/tmp/CoS/$ZFILE" -d /tmp/CoS/tmpAddon
 
 	#Copy only new files into the Addon directory
 	rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
