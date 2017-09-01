@@ -183,7 +183,7 @@ function dlWowIAddon {
 	#Unzip the file to a temp directory
 	ZDIRNAME=tmpCurseDl
 	echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
-	unzip -o /tmp/CoS/$ZFILE -d /tmp/CoS/tmpAddon
+	unzip -o "/tmp/CoS/$ZFILE" -d /tmp/CoS/tmpAddon
 
 	#Copy only new files into the Addon directory
 	rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
