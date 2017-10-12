@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+
 PWD="$(pwd)"
 SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
 ADDONLIST=cullingOfStratholme.list
@@ -21,7 +22,14 @@ do
 done < $ALFULL
 
 #Default WoW install path on OSX
-ADDONPATH=/Applications/World\ of\ Warcraft/Interface/AddOns
+#ADDONPATH=/Applications/World\ of\ Warcraft/Interface/AddOns
+
+#If we're on Linux, then change path
+if [ -f /etc/lsb-release ]
+then
+  echo Found Linux!
+  ADDONPATH=~/Dropbox/WoW/Interface/AddOns
+fi
 
 GREEN="$(tput setaf 2)"
 CRESET="$(tput sgr0)"
@@ -158,7 +166,7 @@ function dlWowIAddon {
 	echo "Updating Addon from wowinterface.com..."
 
 	#Get the URL to download the file
-	local DLURL="http://www.wowinterface.com/downloads/getfile.php?id=$(wget --random-wait -q $1 -O - | grep landing | grep -E -o 'fileid=\d+' | uniq | cut -f2 -d=)"
+	local DLURL="http://www.wowinterface.com/downloads/getfile.php?id=$(wget --random-wait -q $1 -O - | grep landing | grep -E -o 'fileid=[[:digit:]]+' | uniq | cut -f2 -d=)"
 	echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
 	#Get the name of the file itself
