@@ -70,9 +70,12 @@ function parseAddonDirName {
 }
 
 function dlCurseAddon {
-	echo "Updating Addon from curse.com..."
+	echo "Updating Addon from curseforge.com..."
 	#Get the URL to download the file
-	local DLURL="$(wget --random-wait -q $1 -O - | grep "If your download" | grep -E -o 'https://.*\.zip')"
+	local DOMAIN="https://www.curseforge.com"
+	local CURSELINK="$(wget --random-wait -q $1 -O - | grep -i "If your download" | grep -E -o 'href=\".+\"' | cut -f2 -d'"')"
+	echo "CurseLink: ${GREEN}$CURSELINK${CRESET}"
+	local DLURL="${DOMAIN}${CURSELINK}"
 
 	#if [ "$DLURL" != '' ]
 	#then
@@ -202,7 +205,7 @@ function dlAddon {
 	PROVIDER=$(getAddonProvider $1)
 	echo "Found Provider: ${GREEN}$PROVIDER${CRESET}"
 
-	if [ "$PROVIDER" == "curse.com" ]
+	if [ "$PROVIDER" == "curseforge.com" ]
 	then
 		dlCurseAddon $1
 	elif [ "$PROVIDER" == "wowinterface.com" ]
