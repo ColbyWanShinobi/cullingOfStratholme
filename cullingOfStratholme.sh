@@ -58,6 +58,11 @@ function parseFileName {
 	echo "$FILENAME"
 }
 
+function parseCurseFileNameFromListURL {
+	local FILENAME="$(echo $1 | grep -E -o 'addons/.+/download' | cut -f2 -d'/')"
+	echo "${FILENAME}.zip"
+}
+
 function parseDirName {
 	local DIRNAME="$(echo $1 | sed -E 's/.{4}$/ /g')"
 }
@@ -82,7 +87,7 @@ function dlCurseAddon {
 		echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
 		#Get the name of the file itself
-		local ZFILE=$(parseFileName "$DLURL")
+		local ZFILE=$(parseCurseFileNameFromListURL "$DLURL")
 		echo "Zip File: ${GREEN}$ZFILE${CRESET}"
 
 		#Get the name of just the zip file
@@ -97,7 +102,7 @@ function dlCurseAddon {
 		#Download the file
 		echo "Downloading file: ${GREEN}$DLURL${CRESET}"
 		cd /tmp/CoS
-		wget --random-wait -N "$DLURL"
+		wget --random-wait -N -O ${ZFILE} "$DLURL"
 
 		#Unzip the file to a temp directory
 		ZDIRNAME=tmpCurseDl
