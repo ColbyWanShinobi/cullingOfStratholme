@@ -23,6 +23,7 @@ done < $ALFULL
 
 #Default WoW install path on OSX
 #ADDONPATH=/Applications/World\ of\ Warcraft/Interface/AddOns
+ADDONPATH=~/Dropbox/WoW/Interface/AddOns
 
 #If we're on Linux, then change path
 if [ -f /etc/lsb-release ]
