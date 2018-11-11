@@ -175,11 +175,11 @@ function dlWowIAddon {
 	echo "Updating Addon from wowinterface.com..."
 
 	#Get the URL to download the file
-	local DLURL="http://www.wowinterface.com/downloads/getfile.php?id=$(wget --random-wait -q $1 -O - | grep landing | grep -E -o 'fileid=[[:digit:]]+' | uniq | cut -f2 -d=)"
+	local DLURL="https://www.wowinterface.com/downloads/getfile.php?id=$(wget --random-wait -q $1 -O - | grep landing | grep -E -o 'fileid=[[:digit:]]+' | uniq | cut -f2 -d=)"
 	echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
 	#Get the name of the file itself
-	local ZFILE=$(curl -Is $DLURL | grep Content-disposition | cut -f2 -d\")
+	local ZFILE=$(curl -Is $DLURL | grep content-disposition | cut -f2 -d\")
 	echo "Zip File: ${GREEN}$ZFILE${CRESET}"
 
 	#Get the name of just the zip file
