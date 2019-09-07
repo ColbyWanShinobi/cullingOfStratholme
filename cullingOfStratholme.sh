@@ -23,13 +23,13 @@ done < $ALFULL
 
 #Default WoW install path on OSX
 #ADDONPATH=/Applications/World\ of\ Warcraft/Interface/AddOns
-ADDONPATH=~/Dropbox/WoW/Interface/AddOns
+ADDONPATH=~/MEGA/WoW/Interface/AddOns
 
 #If we're on Linux, then change path
 if [ -f /etc/lsb-release ]
 then
   echo Found Linux!
-  ADDONPATH=~/Dropbox/WoW/Interface/AddOns
+  ADDONPATH=~/MEGA/WoW/Interface/AddOns
 fi
 
 GREEN="$(tput setaf 2)"
@@ -163,8 +163,12 @@ function dlGitAddon {
 
 	if [ -d "$ADDONPATH/$GDIRNAME" ]
 	then
-		echo "Updating from git repository for : ${GREEN}$GDIRNAME${CRESET}"
-		git -C "$ADDONPATH/$GDIRNAME" pull
+		#echo "Updating from git repository for : ${GREEN}$GDIRNAME${CRESET}"
+		#git -C "$ADDONPATH/$GDIRNAME" pull
+		echo "Removing git repository for : ${GREEN}$GDIRNAME${CRESET}"
+		rm -rfv "$ADDONPATH/$GDIRNAME"
+		echo "Cloning from git repository for : ${GREEN}$GDIRNAME${CRESET}"
+		git -C "$ADDONPATH" clone $DLURL
 	else
 		echo "Cloning from git repository for : ${GREEN}$GDIRNAME${CRESET}"
 		git -C "$ADDONPATH" clone $DLURL
