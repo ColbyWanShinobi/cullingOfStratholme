@@ -15,7 +15,7 @@ fi
 
 declare -a ADDONS
 ADDONCOUNT=0
-while read f
+while IFS= read -r f || [ -n "${f}" ]
 do
 	ADDONS[$ADDONCOUNT]=$f
 	ADDONCOUNT=$(($ADDONCOUNT + 1))
@@ -155,23 +155,30 @@ function dlIndy {
 function dlGitAddon {
 	echo "Updating Addon using git..."
 	#Get the URL to download the file
-	local DLURL=$1
-	echo "Download URL: ${GREEN}$DLURL${CRESET}"
+	local DLURL=${1}
+	echo "Download URL: ${GREEN}${DLURL}${CRESET}"
 
 	#Get the name of just the zip file
-	local GDIRNAME=$(echo $DLURL | grep -E -o '\w+.git' | cut -f1 -d.)
+	local GDIRNAME=$(echo ${DLURL} | grep -E -o '[-[:alnum:]]+.git' | cut -f1 -d.)
 
-	if [ -d "$ADDONPATH/$GDIRNAME" ]
+	if [ -d "${ADDONPATH}/${GDIRNAME}" ]
 	then
-		#echo "Updating from git repository for : ${GREEN}$GDIRNAME${CRESET}"
-		#git -C "$ADDONPATH/$GDIRNAME" pull
-		echo "Removing git repository for : ${GREEN}$GDIRNAME${CRESET}"
-		rm -rfv "$ADDONPATH/$GDIRNAME"
-		echo "Cloning from git repository for : ${GREEN}$GDIRNAME${CRESET}"
-		git -C "$ADDONPATH" clone $DLURL
+		#Is this a healthy git folder?
+		if [ -d "${ADDONPATH}/${GDIRNAME}/.git" ]
+		then
+			echo "pull from healthy git directory (${ADDONPATH}/${GDIRNAME}) for : ${GREEN}$GDIRNAME${CRESET}"
+			git -C "${ADDONPATH}/${GDIRNAME}" pull ${DLURL}
+		else
+			echo "Removing git directory (${ADDONPATH}/${GDIRNAME}) for : ${GREEN}${GDIRNAME}${CRESET}"
+			rm -rfv "${ADDONPATH}/${GDIRNAME}"
+			echo "Cloning from git repository for : ${GREEN}${GDIRNAME}${CRESET}"
+			git -C "${ADDONPATH}" clone ${DLURL}
+		fi
 	else
-		echo "Cloning from git repository for : ${GREEN}$GDIRNAME${CRESET}"
-		git -C "$ADDONPATH" clone $DLURL
+		echo "Removing git directory (${ADDONPATH}/${GDIRNAME}) for : ${GREEN}${GDIRNAME}${CRESET}"
+		rm -rfv "${ADDONPATH}/${GDIRNAME}"
+		echo "Cloning from git repository for : ${GREEN}${GDIRNAME}${CRESET}"
+		git -C "${ADDONPATH}" clone ${DLURL}	
 	fi
 }
 
@@ -228,10 +235,6 @@ function dlAddon {
 	  dlIndy $1
 	fi
 }
-
-#function getGitAddons {
-
-#}
 
 if [ "$1" != "" ]
 then
