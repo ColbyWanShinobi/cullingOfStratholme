@@ -1,39 +1,5 @@
 #!/bin/bash
-
 set -e
-
-PWD="$(pwd)"
-SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
-ADDONLIST=cullingOfStratholme.list
-ALFULL=$SCRIPTDIR/$ADDONLIST
-
-#Check to see if the text file exists
-if [ ! -f $ALFULL ]
-then
-	echo "Could not find file: $ADDONLIST"
-fi
-
-declare -a ADDONS
-ADDONCOUNT=0
-while IFS= read -r f || [ -n "${f}" ]
-do
-	ADDONS[$ADDONCOUNT]=$f
-	ADDONCOUNT=$(($ADDONCOUNT + 1))
-done < $ALFULL
-
-#Default WoW install path on OSX
-#ADDONPATH=/Applications/World\ of\ Warcraft/Interface/AddOns
-ADDONPATH=~/MEGA/WoW/Interface/AddOns
-
-#If we're on Linux, then change path
-if [ -f /etc/lsb-release ]
-then
-  echo Found Linux!
-  ADDONPATH=~/MEGA/WoW/Interface/AddOns
-fi
-
-GREEN="$(tput setaf 2)"
-CRESET="$(tput sgr0)"
 
 function getAddonProvider {
 	#echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
@@ -49,7 +15,6 @@ function printList {
 	do
 		echo "$ADDONCOUNT - $i"
 		ADDONCOUNT=$((ADDONCOUNT + 1))
-
 	done
 	exit
 }
@@ -115,8 +80,6 @@ function dlCurseAddon {
 	#else
 	    #echo "Download failed for: $1"
 	#fi
-
-
 }
 
 function dlIndy {
@@ -236,20 +199,58 @@ function dlAddon {
 	fi
 }
 
-if [ "$1" != "" ]
+
+REMEMBERPATH="$(pwd)"
+SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
+ADDONLIST=cullingOfStratholme.list
+ADDONPATH=~/MEGA/WoW/retail/Interface/AddOns
+
+if [ "$1" == "classic" ]
 then
-	if [ "$1" == "list" ]
-	then
-		printList
-	else
-		ADDONURL=${ADDONS[$1]}
-		dlAddon $ADDONURL
-	fi
-else
-	for i in "${ADDONS[@]}";
-	do
-		dlAddon $i
-	done
+	echo "Install mods for classic..."
+	ADDONLIST=cullingOfStratholme.classic.list
+	ADDONPATH=~/MEGA/WoW/classic/Interface/AddOns
+	echo ${ADDONLIST}
+	echo ${ADDONPATH}
 fi
 
-cd $PWD
+ALFULL=$SCRIPTDIR/$ADDONLIST
+
+#Check to see if the text file exists
+if [ ! -f $ALFULL ]
+then
+	echo "Could not find file: $ADDONLIST"
+fi
+
+declare -a ADDONS
+ADDONCOUNT=0
+while IFS= read -r f || [ -n "${f}" ]
+do
+	ADDONS[$ADDONCOUNT]=$f
+	ADDONCOUNT=$(($ADDONCOUNT + 1))
+done < $ALFULL
+
+GREEN="$(tput setaf 2)"
+CRESET="$(tput sgr0)"
+
+if [ "$1" == "list" ]
+	then
+		printList
+		cd ${REMEMBERPATH}
+		exit
+fi
+
+if [ "$1" == "test" ]
+	then
+		ADDONURL=${ADDONS[$1]}
+		dlAddon $ADDONURL
+		cd ${REMEMBERPATH}
+		exit
+fi
+
+for i in "${ADDONS[@]}";
+do
+	dlAddon $i
+done
+
+cd ${REMEMBERPATH}
