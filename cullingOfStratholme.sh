@@ -203,13 +203,13 @@ function dlAddon {
 REMEMBERPATH="$(pwd)"
 SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
 ADDONLIST=cullingOfStratholme.list
-ADDONPATH=~/MEGA/WoW/retail/Interface/AddOns
+ADDONPATH=/mnt/d/Games/World\ of\ Warcraft/_retail_/Interface/AddOns
 
 if [ "$1" == "classic" ]
 then
 	echo "Install mods for classic..."
 	ADDONLIST=cullingOfStratholme.classic.list
-	ADDONPATH=~/MEGA/WoW/classic/Interface/AddOns
+	ADDONPATH=/mnt/d/Games/World\ of\ Warcraft/_classic_/Interface/AddOns
 	echo ${ADDONLIST}
 	echo ${ADDONPATH}
 fi
