@@ -203,7 +203,7 @@ function dlAddon {
 REMEMBERPATH="$(pwd)"
 SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
 ADDONLIST=cullingOfStratholme.list
-ADDONPATH=/mnt/d/Games/World\ of\ Warcraft/_retail_/Interface/AddOns
+ADDONPATH=/mnt/o/World\ of\ Warcraft/_retail_/Interface/AddOns
 
 if [ "$1" == "classic" ]
 then
