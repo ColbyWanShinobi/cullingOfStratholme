@@ -209,7 +209,7 @@ if [ "$1" == "classic" ]
 then
 	echo "Install mods for classic..."
 	ADDONLIST=cullingOfStratholme.classic.list
-	ADDONPATH=/mnt/d/Games/World\ of\ Warcraft/_classic_/Interface/AddOns
+	ADDONPATH=/mnt/o/Games/World\ of\ Warcraft/_classic_/Interface/AddOns
 	echo ${ADDONLIST}
 	echo ${ADDONPATH}
 fi
