@@ -141,7 +141,7 @@ function dlGitAddon {
 		echo "Removing git directory (${ADDONPATH}/${GDIRNAME}) for : ${GREEN}${GDIRNAME}${CRESET}"
 		rm -rfv "${ADDONPATH}/${GDIRNAME}"
 		echo "Cloning from git repository for : ${GREEN}${GDIRNAME}${CRESET}"
-		git -C "${ADDONPATH}" clone ${DLURL}	
+		git -C "${ADDONPATH}" clone ${DLURL}
 	fi
 }
 
@@ -203,7 +203,7 @@ function dlAddon {
 REMEMBERPATH="$(pwd)"
 SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
 ADDONLIST=cullingOfStratholme.list
-ADDONPATH=/mnt/o/World\ of\ Warcraft/_retail_/Interface/AddOns
+ADDONPATH=~/Games/battlenet/drive_c/Program\ Files\ \(x86\)/World\ of\ Warcraft/_retail_/Interface/AddOns
 
 if [ "$1" == "classic" ]
 then
@@ -213,6 +213,8 @@ then
 	echo ${ADDONLIST}
 	echo ${ADDONPATH}
 fi
+
+mkdir -p ${ADDONPATH}
 
 ALFULL=$SCRIPTDIR/$ADDONLIST
 
