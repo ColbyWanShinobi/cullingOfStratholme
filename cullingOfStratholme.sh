@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 function getAddonProvider {
 	#echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
@@ -214,7 +214,8 @@ then
 	echo ${ADDONPATH}
 fi
 
-mkdir -p ${ADDONPATH}
+echo "Creating AddOns directory \"${ADDONPATH}\" if it doesn't exist..."
+mkdir -p "${ADDONPATH}"
 
 ALFULL=$SCRIPTDIR/$ADDONLIST
 
