@@ -1,6 +1,12 @@
 #!/bin/bash
 set -ex
 
+REMEMBERPATH="$(pwd)"
+SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
+ADDONLIST=cullingOfStratholme.list
+ADDONPATH=/tmp/deleteme_AddOns
+UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+
 function getAddonProvider {
 	#echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
 	local PROVIDER="$(echo $1 | grep -E -o '\w+\.com')"
@@ -44,7 +50,12 @@ function dlCurseAddon {
 	echo "Updating Addon from curseforge.com..."
 	#Get the URL to download the file
 	local DOMAIN="https://www.curseforge.com"
-	local CURSELINK="$(wget --random-wait -q $1 -O - | grep -i "If your download" | grep -E -o 'href=\".+\"' | cut -f2 -d'"')"
+	local SLUG="$(basename $1)"
+	local PAGEDATA=$(wget --random-wait -q -U "${UA}" $1 -O - | pup 'script#__NEXT_DATA__ json{}' | jq '.[].text' | jq -r .)
+	SLUG_ID=$(echo $PAGEDATA | jq -r .props.pageProps.project.mainFile.id)
+	FNAME=$(echo $PAGEDATA | jq -r .props.pageProps.project.mainFile.fileName)
+	PROJECT_ID=$(echo $PAGEDATA | jq -r .props.pageProps.project.id)
+	local CURSELINK="/api/v1/mods/${PROJECT_ID}/files/${SLUG_ID}/download"
 	echo "CurseLink: ${GREEN}$CURSELINK${CRESET}"
 	local DLURL="${DOMAIN}${CURSELINK}"
 
@@ -53,7 +64,7 @@ function dlCurseAddon {
 		echo "Download URL: ${GREEN}$DLURL${CRESET}"
 
 		#Get the name of the file itself
-		local ZFILE=$(parseCurseFileNameFromListURL "$DLURL")
+		local ZFILE=${FNAME}
 		echo "Zip File: ${GREEN}$ZFILE${CRESET}"
 
 		#Get the name of just the zip file
@@ -68,7 +79,7 @@ function dlCurseAddon {
 		#Download the file
 		echo "Downloading file: ${GREEN}$DLURL${CRESET}"
 		cd /tmp/CoS
-		wget --random-wait -N -O ${ZFILE} "$DLURL"
+		wget --random-wait -U "${UA}" -O ${ZFILE} "$DLURL"
 
 		#Unzip the file to a temp directory
 		ZDIRNAME=tmpCurseDl
@@ -199,11 +210,7 @@ function dlAddon {
 	fi
 }
 
-
-REMEMBERPATH="$(pwd)"
-SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
-ADDONLIST=cullingOfStratholme.list
-ADDONPATH=~/Games/battlenet/drive_c/Program\ Files\ \(x86\)/World\ of\ Warcraft/_retail_/Interface/AddOns
+#Main Loop
 
 if [ "$1" == "classic" ]
 then
