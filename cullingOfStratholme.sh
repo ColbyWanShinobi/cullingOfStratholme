@@ -4,15 +4,19 @@ set -ex
 REMEMBERPATH="$(pwd)"
 SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
 ADDONLIST=cullingOfStratholme.list
-ADDONPATH=/tmp/deleteme_AddOns
+ADDONPATH=/Users/$USER/Dropbox/WoW_Links/retail_links/Interface_Files/AddOns
 UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
 
 function getAddonProvider {
-	#echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
-	local PROVIDER="$(echo $1 | grep -E -o '\w+\.com')"
-	echo $PROVIDER
-	#PROVIDER="$(echo $1 | grep -E -o 'w+.com')"
-	#echo $PROVIDER
+    if [[ $1 == \#* ]]; then
+        echo "SKIP"
+    else
+        #echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
+        local PROVIDER="$(echo $1 | grep -E -o '\w+\.com')"
+        echo $PROVIDER
+        #PROVIDER="$(echo $1 | grep -E -o 'w+.com')"
+        #echo $PROVIDER
+    fi
 }
 
 function printList {
@@ -53,7 +57,7 @@ function dlCurseAddon {
 	local SLUG="$(basename $1)"
 	local PAGEDATA=$(wget --random-wait -q -U "${UA}" $1 -O - | pup 'script#__NEXT_DATA__ json{}' | jq '.[].text' | jq -r .)
 	SLUG_ID=$(echo $PAGEDATA | jq -r .props.pageProps.project.mainFile.id)
-	FNAME=$(echo $PAGEDATA | jq -r .props.pageProps.project.mainFile.fileName)
+	FNAME=$(echo $PAGEDATA | jq -r .props.pageProps.project.mainFile.fileName | sed 's/ /%20/g')
 	PROJECT_ID=$(echo $PAGEDATA | jq -r .props.pageProps.project.id)
 	local CURSELINK="/api/v1/mods/${PROJECT_ID}/files/${SLUG_ID}/download"
 	echo "CurseLink: ${GREEN}$CURSELINK${CRESET}"
@@ -84,7 +88,9 @@ function dlCurseAddon {
 		#Unzip the file to a temp directory
 		ZDIRNAME=tmpCurseDl
 		echo "Unzipping file: ${GREEN}/tmp/$ZFILE${CRESET} to ${GREEN}/tmp/$ZDIRNAME${CRESET}"
-		unzip -o "/tmp/CoS/$ZFILE" -d /tmp/CoS/tmpAddon
+		#unzip -o "/tmp/CoS/$ZFILE" -d /tmp/CoS/tmpAddon
+		#This failed because skada had a trash file in their archive with illegal characters in it so I had to switch to p7zip
+		7z x "/tmp/CoS/$ZFILE" -o/tmp/CoS/tmpAddon
 
 		#Copy only new files into the Addon directory
 		rsync -hvrPt /tmp/CoS/tmpAddon/ "$ADDONPATH"
@@ -205,12 +211,23 @@ function dlAddon {
 	elif [ "$PROVIDER" == "github.com" ]
 	then
 	  dlGitAddon $1
+	elif [ "$PROVIDER" == "SKIP" ]
+	then
+	  echo "Skipping: $1"
 	else
 	  dlIndy $1
 	fi
 }
 
 #Main Loop
+
+# Pre-check for required commands
+for cmd in curl wget jq 7z; do
+  if ! command -v $cmd &> /dev/null; then
+    echo "Error: $cmd is not installed or not in PATH."
+    exit 1
+  fi
+done
 
 if [ "$1" == "classic" ]
 then
