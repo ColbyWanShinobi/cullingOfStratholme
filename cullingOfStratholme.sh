@@ -4,7 +4,7 @@ set -ex
 REMEMBERPATH="$(pwd)"
 SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
 ADDONLIST=cullingOfStratholme.list
-ADDONPATH=/Users/$USER/Dropbox/WoW_Links/retail_links/Interface_Files/AddOns
+ADDONPATH=~/Dropbox/WoW_Links/retail_links/Interface_Files/AddOns
 UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
 
 function getAddonProvider {
