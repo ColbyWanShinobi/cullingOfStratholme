@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 REMEMBERPATH="$(pwd)"
 SCRIPTDIR="$(echo $0 | sed 's/\/cullingOfStratholme.sh//g')"
@@ -7,10 +7,34 @@ ADDONLIST=cullingOfStratholme.list
 ADDONPATH=~/Dropbox/WoW_Links/retail_links/Interface_Files/AddOns
 UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
 
+function dlAddon {
+	echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
+	PROVIDER=$(getAddonProvider $1)
+	echo "Found Provider: ${GREEN}$PROVIDER${CRESET}"
+
+	if [ "$PROVIDER" == "curseforge.com" ]
+	then
+		dlCurseAddon $1
+	elif [ "$PROVIDER" == "wowinterface.com" ]
+	then
+	  dlWowIAddon $1
+	elif [ "$PROVIDER" == "github.com" ]
+	then
+	  dlGitAddon $1
+	elif [ "$PROVIDER" == "SKIP" ]
+	then
+	  echo "Skipping: $1"
+	else
+	  dlIndy $1
+	fi
+}
+
 function getAddonProvider {
     if [[ $1 == \#* ]]; then
         echo "SKIP"
-    else
+		elif [[ -z "${1// }" ]]; then
+				echo "SKIP"
+		else
         #echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
         local PROVIDER="$(echo $1 | grep -E -o '\w+\.com')"
         echo $PROVIDER
@@ -138,16 +162,20 @@ function dlGitAddon {
 	local DLURL=${1}
 	echo "Download URL: ${GREEN}${DLURL}${CRESET}"
 
-	#Get the name of just the zip file
-	local GDIRNAME=$(echo ${DLURL} | grep -E -o '[-[:alnum:]]+.git' | cut -f1 -d.)
+	#Get the string we will use for the directory name
+	local GDIRNAME=$(echo ${DLURL} | grep -E -o '[-[:alnum:]]+.git$' | cut -f1 -d.)
+	echo "Addon name: $GDIRNAME"
 
 	if [ -d "${ADDONPATH}/${GDIRNAME}" ]
 	then
+		echo "Found existing folder for addon: ${GDIRNAME} at ${ADDONPATH}/${GDIRNAME}"
 		#Is this a healthy git folder?
 		if [ -d "${ADDONPATH}/${GDIRNAME}/.git" ]
 		then
-			echo "pull from healthy git directory (${ADDONPATH}/${GDIRNAME}) for : ${GREEN}$GDIRNAME${CRESET}"
-			git -C "${ADDONPATH}/${GDIRNAME}" pull ${DLURL}
+			echo "Pull from healthy git directory (${ADDONPATH}/${GDIRNAME}) for : ${GREEN}$GDIRNAME${CRESET}"
+			cd ${ADDONPATH}/${GDIRNAME}
+			git pull
+			#git -C "${ADDONPATH}/${GDIRNAME}" pull ${DLURL}
 		else
 			echo "Removing git directory (${ADDONPATH}/${GDIRNAME}) for : ${GREEN}${GDIRNAME}${CRESET}"
 			rm -rfv "${ADDONPATH}/${GDIRNAME}"
@@ -155,6 +183,7 @@ function dlGitAddon {
 			git -C "${ADDONPATH}" clone ${DLURL}
 		fi
 	else
+	echo "Could not find existing addon folder: ${ADDONPATH}/${GDIRNAME}"
 		echo "Removing git directory (${ADDONPATH}/${GDIRNAME}) for : ${GREEN}${GDIRNAME}${CRESET}"
 		rm -rfv "${ADDONPATH}/${GDIRNAME}"
 		echo "Cloning from git repository for : ${GREEN}${GDIRNAME}${CRESET}"
@@ -197,30 +226,9 @@ function dlWowIAddon {
 
 }
 
-function dlAddon {
-	echo "Finding Addon Provider for URL: ${GREEN}$1${CRESET}"
-	PROVIDER=$(getAddonProvider $1)
-	echo "Found Provider: ${GREEN}$PROVIDER${CRESET}"
-
-	if [ "$PROVIDER" == "curseforge.com" ]
-	then
-		dlCurseAddon $1
-	elif [ "$PROVIDER" == "wowinterface.com" ]
-	then
-	  dlWowIAddon $1
-	elif [ "$PROVIDER" == "github.com" ]
-	then
-	  dlGitAddon $1
-	elif [ "$PROVIDER" == "SKIP" ]
-	then
-	  echo "Skipping: $1"
-	else
-	  dlIndy $1
-	fi
-}
-
-#Main Loop
-
+#############
+# Main Loop #
+#############
 # Pre-check for required commands
 for cmd in curl wget jq 7z; do
   if ! command -v $cmd &> /dev/null; then
